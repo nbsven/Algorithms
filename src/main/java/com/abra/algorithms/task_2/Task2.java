@@ -6,25 +6,44 @@ import org.apache.commons.lang.ArrayUtils;
 public class Task2 {
 
   public static void main(String[] args) {
-    int[] mas = {3, 1, 5, 6, 2, 4, 7, 8};
+    int[] mas = {7, 1, 2, 6, 4, 5, 3, 8};
 
-    int[] mergeFuntion = mergeFuntion(mas, 0, 4, 4, 8);
+//    mergeFuntion(mas, 0, 4, 4, 8);
+    mergeSort(mas, 0, 8);
 
-    for (int i : mergeFuntion) {
+    for (int i : mas) {
       System.out.println(i);
     }
   }
 
-  private static int[] mergeFuntion(int[] mas, int leftStart, int leftEnd, int rightStart, int rightEnd) {
-    int[] left = ArrayUtils.subarray(mas, leftStart, leftEnd);
-    int[] right = ArrayUtils.subarray(mas, rightStart, rightEnd);
+  private static void mergeSort(int[] mas, int startInclusive, int endExclusive) {
+    int length = endExclusive - startInclusive - 1;
+
+    if (length > 2) {
+      mergeSort(mas, startInclusive, startInclusive + length / 2 + 1);
+      mergeSort(mas, startInclusive + length / 2 + 1, endExclusive);
+    }
+    
+    mergeFuntion(mas, startInclusive, startInclusive + length / 2 + 1, startInclusive + length / 2 + 1, endExclusive);
+  }
+
+  private static void mergeFuntion(int[] mas, int leftStartIn, int leftEndEx, int rightStartIn, int rightEndEx) {
+    int[] left = ArrayUtils.subarray(mas, leftStartIn, leftEndEx);
+    int[] right = ArrayUtils.subarray(mas, rightStartIn, rightEndEx);
     int[] result = ArrayUtils.addAll(left, right);
 
     Arrays.sort(result);
 
-    int[] leftOutside = ArrayUtils.subarray(mas, 0, leftStart);
-    int[] rightOutside = ArrayUtils.subarray(mas, rightEnd, mas.length);
+    int[] leftOutside = ArrayUtils.subarray(mas, 0, leftStartIn);
+    int[] rightOutside = ArrayUtils.subarray(mas, rightEndEx, mas.length);
 
-    return ArrayUtils.addAll(ArrayUtils.addAll(leftOutside, result), rightOutside);
+    result = ArrayUtils.addAll(ArrayUtils.addAll(leftOutside, result), rightOutside);
+    copyToArray(mas, result);
+  }
+
+  private static void copyToArray(int[] mas, int[] result) {
+    for (int i = 0; i < mas.length; i++) {
+      mas[i] = result[i];
+    }
   }
 }
