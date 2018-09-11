@@ -1,6 +1,8 @@
 package com.abra.algorithms.task_1;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,28 +19,33 @@ public class Task1 {
 
     Queue<Integer> queue = new LinkedList<>();
 
-    try (Stream<String> input = Files.lines(Paths.get("src/main/resources/Task1/input.txt"));
+    try (BufferedReader input = new BufferedReader(new FileReader("src/main/resources/Task1/output.txt"));
         BufferedWriter output = new BufferedWriter(new FileWriter("src/main/resources/Task1/output.txt"))) {
+      Integer N = Integer.valueOf(input.readLine());
 
-      input.forEach(line -> {
+      for (int i = 0; i < N; i++) {
+        String line = input.readLine();
+
         String[] split = line.split("\\s");
 
-        if ("?".equals(split[0])) {
-          int min = queue.stream()
-              .mapToInt(Integer::intValue)
-              .summaryStatistics().getMin();
+        switch (split[0]) {
+          case "?": {
+            int min = queue.stream()
+                .mapToInt(Integer::intValue)
+                .summaryStatistics().getMin();
 
-          try {
             output.write(min + "\n");
-          } catch (IOException e) {
-            throw new RuntimeException(e);
+            break;
           }
-        } else if ("-".equals(split[0])) {
-          queue.poll();
-        } else {
-          queue.offer(Integer.valueOf(split[1]));
+          case "-":
+            queue.poll();
+            break;
+          case "+":
+            queue.offer(Integer.valueOf(split[1]));
+            break;
         }
-      });
+        
+      }
     }
   }
 }
