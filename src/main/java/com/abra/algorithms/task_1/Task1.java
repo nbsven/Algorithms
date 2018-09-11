@@ -6,11 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.stream.Stream;
 
 public class Task1 {
 
@@ -44,7 +41,6 @@ public class Task1 {
             queue.offer(Integer.valueOf(split[1]));
             break;
         }
-        
       }
     }
   }
