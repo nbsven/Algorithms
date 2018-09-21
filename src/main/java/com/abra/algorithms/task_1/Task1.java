@@ -16,7 +16,7 @@ public class Task1 {
 
     Queue<Integer> queue = new LinkedList<>();
 
-    try (BufferedReader input = new BufferedReader(new FileReader("src/main/resources/Task1/output.txt"));
+    try (BufferedReader input = new BufferedReader(new FileReader("src/main/resources/Task1/input.txt"));
         BufferedWriter output = new BufferedWriter(new FileWriter("src/main/resources/Task1/output.txt"))) {
       Integer N = Integer.valueOf(input.readLine());
 
