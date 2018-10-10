@@ -126,4 +126,30 @@ public class Tree {
   private Node findMinNode(Node node) {
     return node.getLeft() != null ? node.getLeft() : node;
   }
+
+  public boolean contains(int value) {
+    return contains(root, value);
+  }
+
+  private boolean contains(Node node, int value) {
+    if (node == null) {
+      return false;
+    }
+
+    int key = node.getKey();
+
+    if (value == key) {
+      return true;
+    }
+
+    if (value > key) {
+      return contains(node.getRight(), value);
+    }
+
+    return contains(node.getLeft(), value);
+  }
+
+  public int getRootBalance() {
+    return root == null ? 0 : root.getBalance();
+  }
 }
