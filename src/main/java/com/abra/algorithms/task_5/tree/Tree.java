@@ -104,13 +104,13 @@ public class Tree {
       }
 
       Node min = findMinNode(right);
-      min.setLeft(left);
       min.setRight(removeMinNode(right));
+      min.setLeft(left);
 
-      return min;
+      return balance(min);
     }
 
-    return node;
+    return balance(node);
   }
 
   private Node removeMinNode(Node node) {

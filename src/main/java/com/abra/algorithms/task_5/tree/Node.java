@@ -18,15 +18,15 @@ public class Node {
   }
 
   public int getHeight() {
-    int rightHeight = getNodeHeight(left);
-    int leftHeight = getNodeHeight(right);
+    int rightHeight = getNodeHeight(right);
+    int leftHeight = getNodeHeight(left);
 
-    return leftHeight > rightHeight ? leftHeight : rightHeight;
+    return leftHeight > rightHeight ? leftHeight + 1 : rightHeight + 1;
   }
 
   public int getBalance() {
-    int rightHeight = getNodeHeight(left);
-    int leftHeight = getNodeHeight(right);
+    int rightHeight = getNodeHeight(right);
+    int leftHeight = getNodeHeight(left);
 
     return rightHeight - leftHeight;
   }
