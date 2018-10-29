@@ -167,4 +167,70 @@ public class Btree {
 
     elements.add(key);
   }
+
+  public void remove(int key) {
+
+  }
+
+  private void removeFromLeaf(int key, Node leaf, Node parent) {
+    int size = leaf.getElements().size();
+
+    for (int i = 0; i < size; i++) {
+      Integer element = leaf.getElements().get(i);
+
+      if (key == element) {
+        if (size > factor - 1) {
+          leaf.getElements().remove(key);
+
+          return;
+        } else {
+          leaf.getElements().remove(key);
+          isNeighborExists(leaf, parent);
+          return;
+        }
+      }
+    }
+
+  }
+
+  private boolean isNeighborExists(Node child, Node parent) {
+    List<Node> nodes = parent.getChildren();
+    int index = nodes.indexOf(child);
+    int k1Index = -1;
+    int k2Index = -1;
+    int insertIndex = -1;
+    Node neighbor = null;
+
+    if (index > 0) {
+      Node leftNeighbor = nodes.get(index - 1);
+
+      int neighborSize = leftNeighbor.getElements().size();
+      if (neighborSize > factor - 1) {
+        k1Index = neighborSize - 1;
+        k2Index = index - 1;
+        neighbor = leftNeighbor;
+        insertIndex = 0;
+      }
+    } else if (index < nodes.size() - 1) {
+      Node rightNeighbor = nodes.get(index + 1);
+
+      int neighborSize = rightNeighbor.getElements().size();
+      if (neighborSize > factor - 1) {
+        k1Index = 0;
+        k2Index = index;
+        neighbor = rightNeighbor;
+        insertIndex = child.getElements().size();
+      }
+    }
+
+    if (neighbor != null) {
+      Integer k1 = neighbor.getElements().remove(k1Index);
+      Integer k2 = parent.getElements().remove(k2Index);
+      parent.getElements().add(k2Index, k1);
+      child.getElements().add(insertIndex, k2);
+      return true;
+    }
+    return false;
+  }
+  
 }

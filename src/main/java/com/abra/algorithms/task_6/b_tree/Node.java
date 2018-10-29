@@ -15,4 +15,8 @@ public class Node {
 
   private List<Integer> elements = new LinkedList<>();
   private List<Node> children = new LinkedList<>();
+
+  public boolean isLeaf(){
+    return children.isEmpty();
+  }
 }
