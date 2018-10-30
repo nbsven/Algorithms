@@ -57,6 +57,7 @@ public class Btree {
     }
 
     root = add(key, root);
+    root.fixRelationWithChildren();
   }
 
   private Node add(int key, Node node) {
@@ -67,6 +68,7 @@ public class Btree {
     for (int i = 0; i < count; i++) {
       Integer element = ref.getElements().get(i);
       if (key == element) {
+        node.fixRelationWithChildren();
         return node;
       }
       if (key < element) {
@@ -74,13 +76,16 @@ public class Btree {
         if (ref.getChildren().isEmpty()) {
           addElementToList(key, ref.getElements());
 
+          node.fixRelationWithChildren();
           return node;
         } else {
           Node child = ref.getChildren().get(i);
 
           if (child.getElements().size() < 2 * factor - 1) {
-            ref.getChildren().set(i, add(key, child));
+            Node add = add(key, child);
+            ref.getChildren().set(i, add);
 
+            ref.fixRelationWithChildren();
             return ref;
           } else {
             ref = splitNode(child, ref, i);
@@ -92,13 +97,16 @@ public class Btree {
         if (ref.getChildren().isEmpty()) {
           addElementToList(key, ref.getElements());
 
+          node.fixRelationWithChildren();
           return node;
         } else {
           Node child = ref.getChildren().get(i + 1);
 
           if (child.getElements().size() < 2 * factor - 1) {
-            ref.getChildren().set(i + 1, add(key, child));
+            Node add = add(key, child);
+            ref.getChildren().set(i + 1, add);
 
+            ref.fixRelationWithChildren();
             return ref;
           } else {
             ref = splitNode(child, ref, i + 1);
@@ -109,6 +117,7 @@ public class Btree {
       }
     }
 
+    ref.fixRelationWithChildren();
     return ref;
   }
 
@@ -127,7 +136,9 @@ public class Btree {
     }
 
     Node left = new Node(leftElements, leftNodes);
+    left.fixRelationWithChildren();
     Node right = new Node(rightElements, rightNodes);
+    right.fixRelationWithChildren();
 
     if (parent == null) {
       List<Integer> elements = new LinkedList<>();
@@ -137,7 +148,10 @@ public class Btree {
       nodes.add(left);
       nodes.add(right);
 
-      return new Node(elements, nodes);
+      Node newParent = new Node(elements, nodes);
+      newParent.fixRelationWithChildren();
+
+      return newParent;
     }
 
     parent.getElements().add(index, middle);
@@ -145,6 +159,7 @@ public class Btree {
     parent.getChildren().remove(index);
     parent.getChildren().add(index, left);
     parent.getChildren().add(index + 1, right);
+    parent.fixRelationWithChildren();
 
     return parent;
   }
