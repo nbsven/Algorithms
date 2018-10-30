@@ -27,8 +27,8 @@ public class Task6 {
             break;
           }
           case "-":
-//            tree.remove(X);
-//            output.write(tree.getRootBalance() + "\n");
+            tree.remove(X);
+            output.write(tree.getRootElements() + "\n");
             break;
           case "+":
             tree.add(X);

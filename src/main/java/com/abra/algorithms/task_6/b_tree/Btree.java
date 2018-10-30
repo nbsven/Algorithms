@@ -168,20 +168,56 @@ public class Btree {
     elements.add(key);
   }
 
-  public void remove(int key) {
+  public void remove(Integer key) {
+    if (root.isLeaf()) {
+      root.getElements().remove(key);
+      return;
+    }
 
+    if (root.getElements().size() == 1 && root.getElements().contains(key) && !root.isLeaf()) {
+      Node left = root.getChildren().get(0);
+      Node right = root.getChildren().get(1);
+
+      root = combineNodes(left, key, right);
+      if (root.isLeaf()) {
+        root.getElements().remove(key);
+      } else {
+        remove(key, root);
+      }
+
+      return;
+    }
+
+    searchForRemoving(key, root, null);
   }
 
-  private void removeFromLeaf(int key, Node leaf, Node parent) {
+  private void searchForRemoving(Integer key, Node node, Node parent) {
+    List<Integer> elements = node.getElements();
+
+    for (int i = 0; i < elements.size(); i++) {
+      Integer element = elements.get(i);
+
+      if (element.equals(key)) {
+        alterRemoving(parent, node, key);
+        return;
+      } else if (key < element) {
+        searchForRemoving(key, node.getChildren().get(i), node);
+        return;
+      }
+    }
+
+    searchForRemoving(key, node.getChildren().get(node.getChildren().size() - 1), node);
+  }
+
+  private void removeFromLeaf(Integer key, Node leaf, Node parent) {
     int size = leaf.getElements().size();
 
     for (int i = 0; i < size; i++) {
       Integer element = leaf.getElements().get(i);
 
-      if (key == element) {
+      if (key.equals(element)) {
         if (size > factor - 1) {
           leaf.getElements().remove(key);
-
           return;
         } else {
           leaf.getElements().remove(key);
@@ -193,16 +229,21 @@ public class Btree {
 
   }
 
-  private boolean isNeighborExists(Node child, Node parent) {
+  @SuppressWarnings("Duplicates")
+  private void isNeighborExists(Node child, Node parent) {
     List<Node> nodes = parent.getChildren();
     int index = nodes.indexOf(child);
     int k1Index = -1;
     int k2Index = -1;
     int insertIndex = -1;
+    int neighborIndex = -1;
     Node neighbor = null;
+    Node leftNeighbor = null;
+    Node rightNeighbor = null;
 
     if (index > 0) {
-      Node leftNeighbor = nodes.get(index - 1);
+      neighborIndex = index - 1;
+      leftNeighbor = nodes.get(index - 1);
 
       int neighborSize = leftNeighbor.getElements().size();
       if (neighborSize > factor - 1) {
@@ -211,8 +252,11 @@ public class Btree {
         neighbor = leftNeighbor;
         insertIndex = 0;
       }
-    } else if (index < nodes.size() - 1) {
-      Node rightNeighbor = nodes.get(index + 1);
+    }
+
+    if (index < nodes.size() - 1) {
+      neighborIndex = index + 1;
+      rightNeighbor = nodes.get(index + 1);
 
       int neighborSize = rightNeighbor.getElements().size();
       if (neighborSize > factor - 1) {
@@ -228,9 +272,93 @@ public class Btree {
       Integer k2 = parent.getElements().remove(k2Index);
       parent.getElements().add(k2Index, k1);
       child.getElements().add(insertIndex, k2);
-      return true;
+      return;
     }
-    return false;
+
+    if (index > 0) {
+      Integer middle = parent.getElements().remove(Math.min(index, neighborIndex));
+      parent.getChildren().remove(index);
+      parent.getChildren().remove(neighborIndex);
+
+      Node combined = combineNodes(leftNeighbor, middle, child);
+      parent.getChildren().add(Math.min(index, neighborIndex), combined);
+    }
+
+    if (index < nodes.size() - 1) {
+      Integer middle = parent.getElements().remove(Math.min(index, neighborIndex));
+      parent.getChildren().remove(index);
+      parent.getChildren().remove(neighborIndex);
+
+      Node combined = combineNodes(child, middle, rightNeighbor);
+      parent.getChildren().add(Math.min(index, neighborIndex), combined);
+    }
+
   }
-  
+
+  private Node combineNodes(Node left, int middle, Node right) {
+    List<Node> leftChildren = left.getChildren();
+    List<Node> rightChildren = right.getChildren();
+
+    List<Integer> leftElements = left.getElements();
+    List<Integer> rightElements = right.getElements();
+
+    List<Integer> elements = new LinkedList<>(leftElements);
+    elements.add(middle);
+    elements.addAll(rightElements);
+
+    LinkedList<Node> nodes = new LinkedList<>(leftChildren);
+    nodes.addAll(rightChildren);
+
+    return new Node(elements, nodes);
+  }
+
+  @SuppressWarnings("Duplicates")
+  private void remove(int key, Node node) {
+    List<Integer> elements = node.getElements();
+
+    for (int i = 0; i < elements.size(); i++) {
+      Integer element = elements.get(i);
+
+      if (key == element) {
+        Node left = node.getChildren().get(i);
+        Node right = node.getChildren().get(i + 1);
+
+        if (left.getElements().size() > factor - 1) {
+          Integer innerKey = left.getElements().get(left.getElements().size() - 1);
+          node.getElements().remove(i);
+          node.getElements().add(i, innerKey);
+
+          alterRemoving(node, left, innerKey);
+
+          return;
+        } else if (right.getElements().size() > factor - 1) {
+          Integer innerKey = right.getElements().get(0);
+          node.getElements().remove(i);
+          node.getElements().add(i, innerKey);
+
+          alterRemoving(node, right, innerKey);
+
+          return;
+        } else {
+          Integer middle = node.getElements().remove(i);
+          left = node.getChildren().remove(i);
+          right = node.getChildren().remove(i + 1);
+
+          Node combined = combineNodes(left, middle, right);
+          node.getChildren().set(i, combined);
+
+          alterRemoving(node, combined, key);
+          return;
+        }
+      }
+    }
+  }
+
+  private void alterRemoving(Node parent, Node checkingNode, Integer keyForRemoving) {
+    if (checkingNode.isLeaf()) {
+      removeFromLeaf(keyForRemoving, checkingNode, parent);
+    } else {
+      remove(keyForRemoving, checkingNode);
+    }
+  }
 }
