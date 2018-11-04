@@ -235,8 +235,8 @@ public class Btree {
           leaf.getElements().remove(key);
           return;
         } else {
-          leaf.getElements().remove(key);
-          isNeighborExists(leaf, parent);
+//          leaf.getElements().remove(key);
+          isNeighborExists(leaf, parent, key);
           return;
         }
       }
@@ -245,7 +245,7 @@ public class Btree {
   }
 
   @SuppressWarnings("Duplicates")
-  private void isNeighborExists(Node child, Node parent) {
+  private Integer isNeighborExists(Node child, Node parent, Integer key) {
     List<Node> nodes = parent.getChildren();
     int index = nodes.indexOf(child);
     int k1Index = -1;
@@ -283,30 +283,72 @@ public class Btree {
     }
 
     if (neighbor != null) {
+
+      child.getElements().remove(key);
       Integer k1 = neighbor.getElements().remove(k1Index);
+
+      Node transfer=null;
+      if (!neighbor.isLeaf()) {
+        transfer = neighbor.getChildren().remove(k1Index != 0 ? k1Index + 1 : k1Index);
+        neighbor.fixRelationWithChildren();
+      }
+
       Integer k2 = parent.getElements().remove(k2Index);
       parent.getElements().add(k2Index, k1);
       child.getElements().add(insertIndex, k2);
-      return;
+      if(!neighbor.isLeaf()) {
+        child.getChildren().add(k1Index == 0 ? child.getChildren().size() : 0, transfer);
+        child.fixRelationWithChildren();
+      }
+
+      return key;
     }
 
     if (index > 0) {
-      Integer middle = parent.getElements().remove(Math.min(index, neighborIndex));
+
+      Integer middle;
+      int middleIndex = Math.min(index, neighborIndex);
+      if (parent.getElements().size() <= factor - 1) {
+        if (!parent.isRoot()) {
+          middle = isNeighborExists(parent, parent.getParent(), parent.getElements().get(middleIndex));
+        } else {
+          middle = parent.getElements().remove(middleIndex);
+          root = combineNodes(leftNeighbor, middle, child);
+          return key;
+        }
+      } else {
+        middle = parent.getElements().remove(middleIndex);
+      }
+
       parent.getChildren().remove(index);
       parent.getChildren().remove(neighborIndex);
 
       Node combined = combineNodes(leftNeighbor, middle, child);
       parent.getChildren().add(Math.min(index, neighborIndex), combined);
+      return key;
     }
 
     if (index < nodes.size() - 1) {
-      Integer middle = parent.getElements().remove(Math.min(index, neighborIndex));
+      Integer middle;
+      int middleIndex = Math.min(index, neighborIndex);
+      if (parent.getElements().size() <= factor - 1) {
+        if (!parent.isRoot()) {
+          middle = isNeighborExists(parent, parent.getParent(), parent.getElements().get(middleIndex));
+        } else {
+          middle = parent.getElements().remove(middleIndex);
+          root = combineNodes(child, middle, rightNeighbor);
+          return key;
+        }
+      } else {
+        middle = parent.getElements().remove(middleIndex);
+      }
       parent.getChildren().remove(index);
       parent.getChildren().remove(neighborIndex);
 
       Node combined = combineNodes(child, middle, rightNeighbor);
       parent.getChildren().add(Math.min(index, neighborIndex), combined);
     }
+    return key;
 
   }
 
