@@ -1,16 +1,38 @@
 package com.abra.algorithms.task_2;
 
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.apache.commons.lang.ArrayUtils;
 
 public class Task2 {
 
-  public static void main(String[] args) {
-    int[] mas = {7, 1, 2, 6, 4, 5, 3, 8};
+  private static PrintStream output;
 
-    mergeSort(mas, 0, 8);
+  public static void main(String[] args) throws IOException {
 
-    for (int i : mas) {
-      System.out.println(i);
+    output = new PrintStream(new FileOutputStream("src/main/resources/Task2/output.txt"));
+
+    try (BufferedReader input = new BufferedReader(new FileReader("src/main/resources/Task2/input.txt"))) {
+      Integer N = Integer.valueOf(input.readLine());
+
+      int[] array = Arrays.stream(input.readLine().split("\\s"))
+          .mapToInt(Integer::valueOf)
+          .toArray();
+
+      mergeSort(array, 0, array.length);
+
+      String outputString = Arrays.stream(array)
+          .mapToObj(String::valueOf)
+          .collect(Collectors.joining(" "));
+
+      output.print(outputString);
+    } finally {
+      output.close();
     }
   }
 
@@ -23,6 +45,8 @@ public class Task2 {
     }
 
     mergeFuntion(mas, startInclusive, startInclusive + length / 2 + 1, startInclusive + length / 2 + 1, endExclusive);
+
+    output.printf("%d %d %d %d\n", startInclusive + 1, endExclusive, mas[startInclusive], mas[endExclusive - 1]);
   }
 
   private static void mergeFuntion(int[] mas, int leftStartIn, int leftEndEx, int rightStartIn, int rightEndEx) {
