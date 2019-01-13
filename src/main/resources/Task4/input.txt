@@ -1,0 +1,5 @@
+4 4 1000
+b b a b
+c c c c
+d c b a
+a a a a
