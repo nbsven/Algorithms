@@ -6,15 +6,17 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class Task1 {
 
   public static void main(String[] args) throws IOException {
     InputStream resourceAsStream = Task1.class.getResourceAsStream("Task1/task.txt");
 
-    Queue<Integer> queue = new LinkedList<>();
+    Queue<Integer> queue = new ArrayDeque<>(1_000_000);
 
     try (BufferedReader input = new BufferedReader(new FileReader("src/main/resources/Task1/input.txt"));
         BufferedWriter output = new BufferedWriter(new FileWriter("src/main/resources/Task1/output.txt"))) {
@@ -29,7 +31,8 @@ public class Task1 {
           case "?": {
             int min = queue.stream()
                 .mapToInt(Integer::intValue)
-                .summaryStatistics().getMin();
+                .parallel()
+                .min().orElse(0);
 
             output.write(min + "\n");
             break;
@@ -38,7 +41,11 @@ public class Task1 {
             queue.poll();
             break;
           case "+":
-            queue.offer(Integer.valueOf(split[1]));
+            Integer value = Integer.valueOf(split[1]);
+            queue.offer(value);
+            if (value % 50_000 == 0) {
+              System.out.println("value = " + value);
+            }
             break;
         }
       }
