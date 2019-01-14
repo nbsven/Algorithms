@@ -41,11 +41,7 @@ public class Task1 {
             queue.poll();
             break;
           case "+":
-            Integer value = Integer.valueOf(split[1]);
-            queue.offer(value);
-            if (value % 50_000 == 0) {
-              System.out.println("value = " + value);
-            }
+            queue.offer(Integer.valueOf(split[1]));
             break;
         }
       }

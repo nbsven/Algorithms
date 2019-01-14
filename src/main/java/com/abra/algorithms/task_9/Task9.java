@@ -84,7 +84,7 @@ public class Task9 {
 
     private static void writeResultInFile(String filename) throws IOException {
         try (PrintWriter out = new PrintWriter(filename)) {
-            for (int i = 0; i < graph.length; i++) {
+            for (int i = 1; i < graph.length; i++) {
                 Integer distance = graph[i].getDistance();
 
                 if (distance == Integer.MAX_VALUE) {
