@@ -16,7 +16,7 @@ public class Task1 {
   public static void main(String[] args) throws IOException {
     InputStream resourceAsStream = Task1.class.getResourceAsStream("Task1/task.txt");
 
-    Queue<Integer> queue = new ArrayDeque<>(1_000_000);
+    MyQueue queue = new MyQueue();
 
     try (BufferedReader input = new BufferedReader(new FileReader("src/main/resources/Task1/input.txt"));
         BufferedWriter output = new BufferedWriter(new FileWriter("src/main/resources/Task1/output.txt"))) {
@@ -29,19 +29,16 @@ public class Task1 {
 
         switch (split[0]) {
           case "?": {
-            int min = queue.stream()
-                .mapToInt(Integer::intValue)
-                .parallel()
-                .min().orElse(0);
+            int min = queue.getMin();
 
             output.write(min + "\n");
             break;
           }
           case "-":
-            queue.poll();
+            queue.pop();
             break;
           case "+":
-            queue.offer(Integer.valueOf(split[1]));
+            queue.push(Integer.valueOf(split[1]));
             break;
         }
       }
