@@ -30,10 +30,18 @@ public class MyQueue {
   }
 
   public Integer getMin() {
-    if (stack1.isEmpty() || stack2.isEmpty()) {
-      return stack1.isEmpty() ? stack2.peek().getValue() : stack1.peek().getValue();
-    } else {
-      return Math.min(stack2.peek().getValue(), stack1.peek().getValue());
+    if (stack1.isEmpty() && stack2.isEmpty()) {
+      return 0;
     }
+
+    if (stack2.isEmpty()) {
+      return stack1.peek().getValue();
+    }
+
+    if (stack1.isEmpty()) {
+      return stack2.peek().getValue();
+    }
+
+    return Math.min(stack2.peek().getValue(), stack1.peek().getValue());
   }
 }

@@ -18,10 +18,7 @@ public class Node {
   }
 
   public int getHeight() {
-    int rightHeight = getNodeHeight(right);
-    int leftHeight = getNodeHeight(left);
-
-    return leftHeight > rightHeight ? leftHeight + 1 : rightHeight + 1;
+    return height;
   }
 
   public int getBalance() {
@@ -33,5 +30,34 @@ public class Node {
 
   public static int getNodeHeight(Node node) {
     return node == null ? 0 : node.getHeight();
+  }
+
+  public void fixHeight() {
+    if (right == null && left == null) {
+      height = 1;
+      return;
+    }
+
+    if (right == null) {
+      height = left.height;
+      return;
+    }
+
+    if (left == null) {
+      height = right.height;
+      return;
+    }
+
+    height = Math.max(right.height, left.height) + 1;
+  }
+
+  public void setLeft(Node left) {
+    this.left = left;
+    fixHeight();
+  }
+
+  public void setRight(Node right) {
+    this.right = right;
+    fixHeight();
   }
 }
